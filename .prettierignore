@@ -1,0 +1,4 @@
+dist/
+coverage/
+src/wasm/
+wavelib/

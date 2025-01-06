@@ -1,0 +1,47 @@
+{
+  "name": "wavelibjs",
+  "version": "0.0.2",
+  "description": "WASM build of https://github.com/rafat/wavelib",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "repository": "https://github.com/flatironinstitute/wavelibjs",
+  "author": "Brian Ward",
+  "license": "BSD-3-Clause",
+  "scripts": {
+    "test": "vitest run",
+    "build": "rollup -c",
+    "dev": "rollup -c -w",
+    "format": "prettier . --write",
+    "attw": "attw --pack ."
+  },
+  "prettier": {
+    "tabWidth": 2,
+    "semi": true,
+    "arrowParens": "avoid"
+  },
+  "devDependencies": {
+    "@arethetypeswrong/cli": "^0.15.3",
+    "@rollup/plugin-typescript": "^12.1.2",
+    "@vitest/coverage-v8": "^1.6.0",
+    "eslint": "^9.4.0",
+    "prettier": "^3.3.1",
+    "rollup": "^4.30.0",
+    "rollup-plugin-dts-bundle-generator": "^1.4.0",
+    "tslib": "^2.8.1",
+    "typescript": "^5.6.3",
+    "vitest": "^1.6.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

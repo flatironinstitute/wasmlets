@@ -1,0 +1,4 @@
+src/wasm/
+node_modules/
+dist/
+coverage/
