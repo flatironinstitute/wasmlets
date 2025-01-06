@@ -2,16 +2,21 @@ CC = emcc
 CXX = em++
 CPPFLAGS = -I wavelib/header/
 
-CXXFLAGS+=-fwasm-exceptions -sALLOW_MEMORY_GROWTH=1
+LDFLAGS+=-sMODULARIZE -sEXPORT_NAME=createModule -sEXPORT_ES6  -sINCOMING_MODULE_JS_API=print,printErr,wasmBinary
+LDFLAGS+=-sENVIRONMENT=web,node # node needed for vitest
+LDFLAGS+=-sEXIT_RUNTIME=1 -sSINGLE_FILE=1 -sALLOW_MEMORY_GROWTH=1
 
-LDFLAGS+=-sMODULARIZE -sEXPORT_NAME=createModule -sEXPORT_ES6 -sENVIRONMENT=web -sINCOMING_MODULE_JS_API=print,printErr,wasmBinary
-LDFLAGS+=-sEXIT_RUNTIME=1 -sSINGLE_FILE=1
 
-EXPORTS=_malloc,_free,_wave_init,_wt_init,_wtree_init,_wpt_init,_dwt,_idwt,_wave_free,_wt_free,_wtree_free,_wpt_free
+EXPORTS=_malloc,_free,_wave_init,_wt_init,_wtree_init,_wpt_init,_dwt,_idwt,_wave_free,_wt_free,_wtree_free,_wpt_free,_setDWTExtension,_wave_filtlength,_set_wt_output,_wt_output,_wt_outlength,_wt_lenlength,_wt_length,_wt_summary
 LDFLAGS+=-sEXPORTED_FUNCTIONS=$(EXPORTS) -sEXPORTED_RUNTIME_METHODS=stringToUTF8,getValue,UTF8ToString,lengthBytesUTF8
 
-src/wasm/wavelib.js: wavelib/build_wasm/Bin/libwavelib.a
-	$(LINK.cc) -o $@ $^ --emit-tsd intf.d.ts
+
+
+src/wasm/wavelib.js: wavelib.o wavelib/build_wasm/Bin/libwavelib.a
+	$(LINK.c) -o $@ $^ --emit-tsd intf.d.ts
+
+wavelib.o: wavelib.c
+	$(COMPILE.c) -o $@ $<
 
 .SILENT: wavelib/build_wasm/Bin/libwavelib.a
 wavelib/build_wasm/Bin/libwavelib.a:
@@ -21,4 +26,5 @@ wavelib/build_wasm/Bin/libwavelib.a:
 
 clean:
 	$(RM) -r wavelib/build_wasm
+	$(RM) wavelib.o
 	$(RM) src/wasm/wavelib.js src/wasm/wavelib.wasm src/wasm/intf.d.ts
