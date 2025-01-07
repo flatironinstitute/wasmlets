@@ -7,7 +7,7 @@ LDFLAGS+=-sENVIRONMENT=web,node # node needed for vitest
 LDFLAGS+=-sEXIT_RUNTIME=1 -sSINGLE_FILE=1 -sALLOW_MEMORY_GROWTH=1
 
 
-EXPORTS=_malloc,_free,_wave_init,_wt_init,_dwt,_idwt,_wave_free,_wt_free,_setDWTExtension,_wave_filtlength,_set_wt_output,_wt_output,_wt_outlength,_wt_lenlength,_wt_length,_wt_summary
+EXPORTS=_malloc,_free,_wave_init,_wt_init,_dwt,_idwt,_wave_free,_wt_free,_setDWTExtension,_setWTConv,_wave_filtlength,_set_wt_output,_wt_output,_wt_outlength,_wt_lenlength,_wt_length,_wt_summary
 LDFLAGS+=-sEXPORTED_FUNCTIONS=$(EXPORTS) -sEXPORTED_RUNTIME_METHODS=stringToUTF8,getValue,UTF8ToString,lengthBytesUTF8
 
 CFLAGS=-O3

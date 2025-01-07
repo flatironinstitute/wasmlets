@@ -36,6 +36,7 @@ interface WasmModule {
   _dwt(wt: wt_object, input: ptr): void;
   _idwt(wt: wt_object, dwtop: ptr): void;
   _setDWTExtension(wt: wt_object, extension: cstr): void;
+  _setWTConv(wt: wt_object, cmethod: cstr): void;
   _wave_free(obj: wave_object): void;
   _wt_summary(obj: wt_object): void;
   _wt_free(obj: wt_object): void;
