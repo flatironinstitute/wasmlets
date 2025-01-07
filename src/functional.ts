@@ -12,20 +12,21 @@ export async function init(wasmUrl?: string) {
   if (module) {
     return;
   }
-  // https://nickb.dev/blog/recommendations-when-publishing-a-wasm-library/
-  console.log("TODO: implement custom loading from", wasmUrl);
+  if (wasmUrl) {
+    // https://nickb.dev/blog/recommendations-when-publishing-a-wasm-library/
+    console.log("TODO: implement custom loading from", wasmUrl);
+  }
+
   module = await createModule({});
 }
 
-function check() {
+function check_initialized() {
   if (!module) {
     throw new Error("need to call init() before using this function");
   }
 }
 
 function encodeString(s: string): cstr {
-  check();
-
   const len = module.lengthBytesUTF8(s) + 1;
   const ptr = module._malloc(len) as unknown as cstr;
   module.stringToUTF8(s, ptr, len);
@@ -33,6 +34,7 @@ function encodeString(s: string): cstr {
 }
 
 function dwt_max_level(input_len: number, wavelet: wave_object): number {
+  // TODO: verify
   let filter_len: number = module._wave_filtlength(wavelet);
 
   if (filter_len <= 1 || input_len < filter_len - 1) return 0;
@@ -47,20 +49,20 @@ export function wavedec(
   mode: Mode = "sym",
   level: number | undefined = undefined,
 ): Float64Array[] {
-  check();
+  check_initialized();
 
   const wave_str = encodeString(wavelet);
   const w = module._wave_init(wave_str);
   module._free(wave_str);
+
   if (level === undefined) {
     level = dwt_max_level(data.length, w);
   }
 
-  console.log("level", level);
-
   const mode_str = encodeString("dwt");
-
   const wt = module._wt_init(w, mode_str, data.length, level);
+  module._free(mode_str);
+
   if (mode == "per") {
     let str = encodeString("per");
     module._setDWTExtension(wt, str);
@@ -72,73 +74,88 @@ export function wavedec(
   ) as unknown as ptr;
   module.HEAPF64.set(data, a_ptr / Float64Array.BYTES_PER_ELEMENT);
   module._dwt(wt, a_ptr);
-  module._wt_summary(wt);
 
-  // TODO investigate why -1 
+  // note: -1 because the last element is the original signal length
   let len_len = module._wt_lenlength(wt) - 1;
   let lens_ptr = module._wt_length(wt) / Int32Array.BYTES_PER_ELEMENT;
   let lens = module.HEAP32.subarray(lens_ptr, lens_ptr + len_len);
-  let out_ptr = module._wt_output(wt);
+  let out_ptr = (module._wt_output(wt) / Float64Array.BYTES_PER_ELEMENT) as ptr;
 
   let coeffs: Float64Array[] = [];
 
   for (let i = 0; i < lens.length; i++) {
     let len = lens[i];
-    let coeff = module.HEAPF64.subarray(
-      out_ptr / Float64Array.BYTES_PER_ELEMENT,
-      out_ptr / Float64Array.BYTES_PER_ELEMENT + len,
-    );
+    let coeff = module.HEAPF64.slice(out_ptr, out_ptr + len);
     coeffs.push(coeff);
-    out_ptr = ((out_ptr as number) +
-      len * Float64Array.BYTES_PER_ELEMENT) as unknown as ptr;
+    out_ptr = (out_ptr + len) as ptr;
   }
 
   module._wt_free(wt);
-  module._free(mode_str);
+  module._wave_free(w);
   return coeffs;
 }
 
 export function waverec(
   coeffs: Float64Array[],
   wavelet: Wavelet,
+  signallength: number,
   mode: Mode = "sym",
 ): Float64Array {
-  check();
+  check_initialized();
 
-  // if (coeffs.length < 1) {
-  //   throw new Error("coeffs must have at least one element");
-  // } else if (coeffs.length === 1) {
-  //   // level 0 transform (just returns the approximation coefficients)
-  //   return coeffs[0];
-  // }
+  if (coeffs.length < 1) {
+    throw new Error("coeffs must have at least one element");
+  } else if (coeffs.length === 1) {
+    // level 0 transform (just returns the approximation coefficients)
+    return coeffs[0];
+  }
 
-  // const mode_str = encodeString("dwt");
+  const wave_str = encodeString(wavelet);
+  const w = module._wave_init(wave_str);
+  module._free(wave_str);
 
-  // let [a, ...ds] = coeffs;
+  const mode_str = encodeString("dwt");
+  // TODO: how to determine the signal length automatically?
+  const wt = module._wt_init(w, mode_str, signallength, coeffs.length - 1);
+  module._free(mode_str);
 
-  // for (let i = 0; i < ds.length; i++) {
-  //   if (a.length != ds[i].length + 1 + i) {
-  //     throw new Error("coeffs must be in order of increasing resolution");
-  //   }
-  // }
+  if (mode == "per") {
+    let str = encodeString("per");
+    module._setDWTExtension(wt, str);
+    module._free(str);
+  }
 
-  // const wave_str = encodeString(wavelet);
-  // const w = module._wave_init(wave_str);
-  // module._free(wave_str);
-  // for (let i = 0; i < ds.length; i++) {
-  //   const d = ds[i];
-  //   // TODO no idea what the final argument is for
-  //   const wt = module._wt_init(w, mode_str, d.length, i);
-  //   if (mode == "per") {
-  //     let str = encodeString("per");
-  //     module._setDWTExtension(wt, str);
-  //     module._free(str);
-  //   }
+  const output_len = coeffs.reduce((a, b) => a + b.length, 0);
+  const output = module._malloc(
+    output_len * Float64Array.BYTES_PER_ELEMENT,
+  ) as ptr;
 
-  //   module._wt_free(wt);
-  // }
+  let len_len = coeffs.length;
 
-  // module._free(mode_str);
+  const lengths = module._malloc(len_len * Int32Array.BYTES_PER_ELEMENT) as ptr;
+  let offset = 0;
+  for (let i = 0; i < coeffs.length; i++) {
+    let coeff = coeffs[i];
+    module.HEAPF64.set(coeff, output / Float64Array.BYTES_PER_ELEMENT + offset);
+    offset += coeff.length;
+    module.HEAP32[lengths / Int32Array.BYTES_PER_ELEMENT + i] = coeff.length;
+  }
 
-  // return a;
+  module._set_wt_output(wt, output, output_len, lengths, len_len);
+  module._free(lengths);
+
+  const dwtop = module._malloc(
+    signallength * Float64Array.BYTES_PER_ELEMENT,
+  ) as ptr;
+  module._idwt(wt, dwtop);
+  let result = module.HEAPF64.slice(
+    dwtop / Float64Array.BYTES_PER_ELEMENT,
+    dwtop / Float64Array.BYTES_PER_ELEMENT + signallength,
+  );
+
+  module._free(dwtop);
+  module._wt_free(wt);
+  module._wave_free(w);
+
+  return result;
 }
