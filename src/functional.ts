@@ -63,10 +63,6 @@ export function wavedec(
   const wt = module._wt_init(w, mode_str, data.length, level);
   module._free(mode_str);
 
-  const conv_str = encodeString("fft");
-  module._setWTConv(wt, conv_str);
-  module._free(conv_str);
-
   if (mode == "per") {
     let str = encodeString("per");
     module._setDWTExtension(wt, str);
@@ -79,6 +75,7 @@ export function wavedec(
   module.HEAPF64.set(data, a_ptr / Float64Array.BYTES_PER_ELEMENT);
   module._dwt(wt, a_ptr);
   module._free(a_ptr);
+  // module._wt_summary(wt);
 
   // note: -1 because the last element is the original signal length
   let len_len = module._wt_lenlength(wt) - 1;
@@ -124,10 +121,6 @@ export function waverec(
   const wt = module._wt_init(w, mode_str, signallength, coeffs.length - 1);
   module._free(mode_str);
 
-  const conv_str = encodeString("fft");
-  module._setWTConv(wt, conv_str);
-  module._free(conv_str);
-
   if (mode == "per") {
     let str = encodeString("per");
     module._setDWTExtension(wt, str);
@@ -152,11 +145,13 @@ export function waverec(
 
   module._set_wt_output(wt, output, output_len, lengths, len_len);
   module._free(lengths);
+  // module._wt_summary(wt);
 
   const dwtop = module._malloc(
     signallength * Float64Array.BYTES_PER_ELEMENT,
   ) as ptr;
   module._idwt(wt, dwtop);
+  // module._wt_summary(wt);
   let result = module.HEAPF64.slice(
     dwtop / Float64Array.BYTES_PER_ELEMENT,
     dwtop / Float64Array.BYTES_PER_ELEMENT + signallength,
