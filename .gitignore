@@ -4,3 +4,4 @@ dist/
 coverage/
 *.o
 yarn.lock
+wasmlets*.tgz
