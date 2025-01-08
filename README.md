@@ -8,6 +8,23 @@ environment, by compiling existing libraries to
 Currently, we are using the [wavelib](https://github.com/rafat/wavelib)
 C library as the underlying implementation.
 
+## Installation
+
+npm i wasmlets
+
+## Use
+
+Before calling anything else, you must await the `init()` function
+to load the WebAssembly module.
+
+Then there are two functions, inspired by the API from [PyWavelets](https://pywavelets.readthedocs.io/en/latest/index.html):
+
+```typescript
+function wavedec(data: Float64Array, wavelet: Wavelet, mode?: Mode, level?: number | undefined): Float64Array[]
+function waverec(coeffs: Float64Array[], wavelet: Wavelet, signallength: number, mode?: Mode): Float64Array
+```
+
+
 ## Building
 
 You will need both [Emscripten](https://emscripten.org/docs/getting_started/downloads.html)
