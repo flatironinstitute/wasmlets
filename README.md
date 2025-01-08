@@ -10,7 +10,9 @@ C library as the underlying implementation.
 
 ## Installation
 
+```sh
 npm i wasmlets
+```
 
 ## Use
 
