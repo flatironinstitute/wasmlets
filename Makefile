@@ -3,7 +3,7 @@ CXX = em++
 
 CPPFLAGS+= -I c/wavelib/header/
 
-# CFLAGS+=-Og --profiling
+# CFLAGS+=-Og --profiling -sASSERTIONS=1 -sSAFE_HEAP=1 -sSTACK_OVERFLOW_CHECK=2
 CFLAGS+=-O3 --closure 1
 
 LDFLAGS+=-sDEFAULT_TO_CXX=0 -sWASM=1

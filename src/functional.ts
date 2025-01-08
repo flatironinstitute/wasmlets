@@ -192,6 +192,11 @@ export function waverec(
   );
 
   module._free(dwtop);
+  // still needs to be freed, even though
+  // we passed it in to _set_wt_output, because
+  // the normal output is just extra storage at the end of
+  // the struct, so the pointer is never directly freed
+  module._free(output);
   module._wt_free(wt);
   module._wave_free(w);
 
