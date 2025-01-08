@@ -5,7 +5,7 @@ import { RuntimeExports } from "./intf";
 
 
 // Newtype trick to create distinct types for different kinds of pointers
-const brand = Symbol("brand");
+declare const brand: unique symbol;
 type Brand<T, U> = T & {
   [brand]: U;
 };

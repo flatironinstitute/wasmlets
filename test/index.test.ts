@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import { init, wavedec, waverec } from "wavelibjs";
+import { init, wavedec, waverec } from "wasmlets";
 
 function expectArrayCloseTo(
   a: Float64Array | number[],

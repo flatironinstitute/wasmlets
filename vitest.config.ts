@@ -3,14 +3,14 @@ import { defineConfig } from "vitest/config";
 export default defineConfig({
   test: {
     mockReset: true,
-    coverage: {
-      enabled: true,
-      include: ["src/**/*.ts"],
-      provider: "v8",
-      reporter: ["text", "lcov"],
-    },
+    // coverage: {
+    //   enabled: true,
+    //   include: ["src/**/*.ts"],
+    //   provider: "v8",
+    //   reporter: ["text", "lcov"],
+    // },
     alias: {
-      wavelibjs: new URL("./src/", import.meta.url).pathname,
+      wasmlets: new URL("./src/", import.meta.url).pathname,
     },
   },
 });

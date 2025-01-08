@@ -1,28 +1,47 @@
 {
-  "name": "wavelibjs",
-  "version": "0.0.2",
-  "description": "WASM build of https://github.com/rafat/wavelib",
+  "name": "wasmlets",
+  "version": "0.0.1",
+  "description": "WASM compiled code for wavelet decompositions. Currently based on https://github.com/rafat/wavelib",
   "type": "module",
   "exports": {
     ".": {
       "import": {
         "types": "./dist/index.d.ts",
         "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
       }
     }
   },
   "files": [
     "dist"
   ],
-  "repository": "https://github.com/flatironinstitute/wavelibjs",
+  "repository": "https://github.com/flatironinstitute/wasmlets",
   "author": "Brian Ward",
   "license": "BSD-3-Clause",
   "scripts": {
     "test": "vitest run",
-    "build": "rollup -c",
-    "dev": "rollup -c -w",
+    "prepack": "make && yarn build",
+    "build": "tsup",
+    "dev": "tsup --watch",
     "format": "prettier . --write",
     "attw": "attw --pack ."
+  },
+  "tsup": {
+    "entry": [
+      "src/index.ts"
+    ],
+    "format": [
+      "cjs",
+      "esm"
+    ],
+    "dts": true,
+    "splitting": false,
+    "sourcemap": true,
+    "shims": true,
+    "clean": true
   },
   "prettier": {
     "tabWidth": 2,
@@ -31,13 +50,10 @@
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.15.3",
-    "@rollup/plugin-typescript": "^12.1.2",
     "@vitest/coverage-v8": "^1.6.0",
     "eslint": "^9.4.0",
     "prettier": "^3.3.1",
-    "rollup": "^4.30.0",
-    "rollup-plugin-dts-bundle-generator": "^1.4.0",
-    "tslib": "^2.8.1",
+    "tsup": "^8.3.5",
     "typescript": "^5.6.3",
     "vitest": "^1.6.0"
   },

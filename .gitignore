@@ -2,4 +2,5 @@ src/wasm/
 node_modules/
 dist/
 coverage/
-wavelib.o
+*.o
+yarn.lock

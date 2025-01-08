@@ -6,8 +6,8 @@
     /* Modules */
     "module": "ESNext" /* Specify what module code is generated. */,
     "paths": {
-      "wavelibjs": ["./src/index.ts"],
-      "wavelibjs/*": ["./src/*"]
+      "wasmlets": ["./src/index.ts"],
+      "wasmlets/*": ["./src/*"]
     },
     "rootDir": ".",
     /* Emit */
