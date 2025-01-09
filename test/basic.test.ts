@@ -15,6 +15,14 @@ describe("wavedec", () => {
     expectArrayCloseTo(cD2, [4, -3.5]);
     expectArrayCloseTo(cD1, [-2.82842712, 0, -4.94974747, -1.41421356]);
   });
+
+  test("zero levels returns input", async () => {
+    await init();
+
+    const x = new Float64Array([3, 7, 1, 1, -2, 5, 4, 6]);
+    const [cA] = wavedec(x, "db1", "sym", 0);
+    expect(cA).toBe(x);
+  });
 });
 
 describe("waverec", () => {
@@ -25,6 +33,22 @@ describe("waverec", () => {
     const coeffs = wavedec(x, "db1");
     const x_rec = waverec(coeffs, "db1", x.length);
     expectArrayCloseTo(x, x_rec);
+  });
+
+  test("too few coeffs", async () => {
+    await init();
+
+    expect(() => waverec([], "db1", 1)).toThrow(/.*have at least one.*/);
+  });
+
+  test("level 0 just returns input", async () => {
+    await init();
+
+    const x = new Float64Array([3, 7, 1, 1, -2, 5, 4, 6]);
+    const coeffs = wavedec(x, "db1", "sym", 0);
+
+    const x_rec = waverec(coeffs, "db1", x.length);
+    expect(x_rec).toBe(x);
   });
 
   test("odd_length", async () => {

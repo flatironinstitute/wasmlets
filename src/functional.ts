@@ -80,6 +80,10 @@ export function wavedec(
     level = dwt_max_level(data.length, w);
   }
 
+  if (level === 0) {
+    return [data];
+  }
+
   const mode_str = encodeString("dwt");
   const wt = module._wt_init(w, mode_str, data.length, level);
   module._free(mode_str);
