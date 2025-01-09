@@ -1,4 +1,4 @@
-# wasmlets -  wavelet transforms for the web
+# wasmlets - wavelet transforms for the web
 
 The goal of wasmlets is to provide fast wavelet decomposition
 and reconstruction functions for use from a JavaScript (or Typescript)
@@ -22,10 +22,19 @@ to load the WebAssembly module.
 Then there are two functions, inspired by the API from [PyWavelets](https://pywavelets.readthedocs.io/en/latest/index.html):
 
 ```typescript
-function wavedec(data: Float64Array, wavelet: Wavelet, mode?: Mode, level?: number | undefined): Float64Array[]
-function waverec(coeffs: Float64Array[], wavelet: Wavelet, signallength: number, mode?: Mode): Float64Array
+function wavedec(
+  data: Float64Array,
+  wavelet: Wavelet,
+  mode?: Mode,
+  level?: number | undefined,
+): Float64Array[];
+function waverec(
+  coeffs: Float64Array[],
+  wavelet: Wavelet,
+  signallength: number,
+  mode?: Mode,
+): Float64Array;
 ```
-
 
 ## Building
 

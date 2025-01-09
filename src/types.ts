@@ -33,7 +33,7 @@ export type Wavelet =
   | "haar"
   | Biorthogonal
   | `r${Biorthogonal}`
-  | `db${IntRange<1, 37>}`
+  | `db${IntRange<1, 39>}`
   | `coif${IntRange<1, 18>}`
   | `sym${IntRange<2, 21>}`;
 

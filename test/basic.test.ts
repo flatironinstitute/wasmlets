@@ -1,16 +1,7 @@
 import { describe, expect, test } from "vitest";
 
 import { init, wavedec, waverec } from "wasmlets";
-
-function expectArrayCloseTo(
-  a: Float64Array | number[],
-  b: Float64Array | number[],
-) {
-  expect(a.length).toBe(b.length);
-  for (let i = 0; i < a.length; i++) {
-    expect(a[i]).toBeCloseTo(b[i]);
-  }
-}
+import { expectArrayCloseTo } from "./util";
 
 describe("wavedec", () => {
   // https://github.com/PyWavelets/pywt/blob/cf622996f3f0dedde214ab696afcd024660826dc/pywt/tests/test_multilevel.py#L69

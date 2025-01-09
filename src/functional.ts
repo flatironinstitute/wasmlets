@@ -12,6 +12,7 @@ type InitOptions = {
   // TODO: consider alt wasm source?
   // https://nickb.dev/blog/recommendations-when-publishing-a-wasm-library/
   // wasmUrl?: string;
+  _?: never;
 };
 
 /**
@@ -43,8 +44,8 @@ function encodeString(s: string): cstr {
 }
 
 function dwt_max_level(input_len: number, wavelet: wave_object): number {
-  // TODO: verify this is the same as pywt.dwt_max_level
-  let filter_len: number = module._wave_filtlength(wavelet);
+  // See note in https://pywavelets.readthedocs.io/en/latest/ref/dwt-discrete-wavelet-transform.html#pywt.dwt_max_level
+  const filter_len = module._wave_filtlength(wavelet);
 
   if (filter_len <= 1 || input_len < filter_len - 1) return 0;
 
@@ -105,11 +106,11 @@ export function wavedec(
   const out_ptr = module._wt_output(wt) / Float64Array.BYTES_PER_ELEMENT;
   const coeffs_flat = module.HEAPF64.slice(out_ptr, out_ptr + outlength);
 
-  let coeffs: Float64Array[] = [];
+  const coeffs: Float64Array[] = [];
 
   let offset = 0;
   for (let i = 0; i < lens.length; i++) {
-    let len = lens[i];
+    const len = lens[i];
     coeffs.push(coeffs_flat.subarray(offset, offset + len));
     offset += len;
   }
@@ -155,7 +156,7 @@ export function waverec(
   module._free(mode_str);
 
   if (mode == "per") {
-    let str = encodeString("per");
+    const str = encodeString("per");
     module._setDWTExtension(wt, str);
     module._free(str);
   }
@@ -168,12 +169,12 @@ export function waverec(
     output_len * Float64Array.BYTES_PER_ELEMENT,
   ) as ptr;
 
-  let len_len = coeffs.length;
-
+  const len_len = coeffs.length;
   const lengths = module._malloc(len_len * Int32Array.BYTES_PER_ELEMENT) as ptr;
+
   let offset = 0;
   for (let i = 0; i < coeffs.length; i++) {
-    let coeff = coeffs[i];
+    const coeff = coeffs[i];
     module.HEAPF64.set(coeff, output / Float64Array.BYTES_PER_ELEMENT + offset);
     offset += coeff.length;
     module.HEAP32[lengths / Int32Array.BYTES_PER_ELEMENT + i] = coeff.length;
@@ -186,7 +187,7 @@ export function waverec(
     signallength * Float64Array.BYTES_PER_ELEMENT,
   ) as ptr;
   module._idwt(wt, dwtop);
-  let result = module.HEAPF64.slice(
+  const result = module.HEAPF64.slice(
     dwtop / Float64Array.BYTES_PER_ELEMENT,
     dwtop / Float64Array.BYTES_PER_ELEMENT + signallength,
   );
