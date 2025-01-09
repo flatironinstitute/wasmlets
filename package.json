@@ -1,6 +1,6 @@
 {
   "name": "wasmlets",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "WASM compiled code for wavelet decompositions. Currently based on https://github.com/rafat/wavelib",
   "type": "module",
   "exports": {
