@@ -19,7 +19,7 @@ LDFLAGS+=-sEXPORTED_RUNTIME_METHODS=stringToUTF8,getValue,UTF8ToString,lengthByt
 SOURCES = c/wavelib_helpers.c $(wildcard c/wavelib/src/*.c)
 
 src/wasm/wavelib.js: $(SOURCES)
-	$(LINK.c) -o $@ $? --emit-tsd intf.d.ts
+	$(LINK.c) -o $@ $^ --emit-tsd intf.d.ts
 
 clean:
 	$(RM) src/wasm/wavelib.js src/wasm/wavelib.wasm src/wasm/intf.d.ts

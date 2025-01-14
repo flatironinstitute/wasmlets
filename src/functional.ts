@@ -52,6 +52,18 @@ function dwt_max_level(input_len: number, wavelet: wave_object): number {
   return Math.floor(Math.log2(input_len / (filter_len - 1)));
 }
 
+function idwt_buffer_length(
+  coeffs_len: number,
+  filter_len: number,
+  mode: Mode,
+): number {
+  // See https://github.com/PyWavelets/pywt/blob/cf622996f3f0dedde214ab696afcd024660826dc/pywt/_extensions/c/common.c#L67
+  if (mode == "per") {
+    return 2 * coeffs_len;
+  }
+  return 2 * coeffs_len - filter_len + 2;
+}
+
 /**
  * Perform a wavelet decomposition on a 1D signal.
  *
@@ -130,7 +142,6 @@ export function wavedec(
  * @param coeffs - an array of Float64Arrays, where the first element is the
  * approximation coefficients and the rest are detail coefficients
  * @param wavelet - the name of the wavelet to use
- * @param signallength - the length of the reconstructed signal
  * @param mode - the mode to use for the DWT, either "sym" (default)
  * or "per"
  * @returns the reconstructed signal as a Float64Array
@@ -138,7 +149,6 @@ export function wavedec(
 export function waverec(
   coeffs: Float64Array[],
   wavelet: Wavelet,
-  signallength: number,
   mode: Mode = "sym",
 ): Float64Array {
   check_initialized();
@@ -154,9 +164,24 @@ export function waverec(
   const w = module._wave_init(wave_str);
   module._free(wave_str);
 
+  const filterLength = module._wave_filtlength(w);
+
+  let signalLength = idwt_buffer_length(coeffs[0].length, filterLength, mode);
+
+  for (let i = 2; i < coeffs.length; i++) {
+    const c_length = coeffs[i].length;
+    if (signalLength == c_length + 1) {
+      signalLength = c_length;
+    } else if (signalLength != c_length) {
+      throw new Error(
+        `Coefficient shape mismatch  ${signalLength},  ${c_length}`,
+      );
+    }
+    signalLength = idwt_buffer_length(signalLength, filterLength, mode);
+  }
+
   const mode_str = encodeString("dwt");
-  // TODO: how to determine the signal length automatically?
-  const wt = module._wt_init(w, mode_str, signallength, coeffs.length - 1);
+  const wt = module._wt_init(w, mode_str, signalLength, coeffs.length - 1);
   module._free(mode_str);
 
   if (mode == "per") {
@@ -188,12 +213,12 @@ export function waverec(
 
   // call the inverse transform
   const dwtop = module._malloc(
-    signallength * Float64Array.BYTES_PER_ELEMENT,
+    signalLength * Float64Array.BYTES_PER_ELEMENT,
   ) as ptr;
   module._idwt(wt, dwtop);
   const result = module.HEAPF64.slice(
     dwtop / Float64Array.BYTES_PER_ELEMENT,
-    dwtop / Float64Array.BYTES_PER_ELEMENT + signallength,
+    dwtop / Float64Array.BYTES_PER_ELEMENT + signalLength,
   );
 
   module._free(dwtop);

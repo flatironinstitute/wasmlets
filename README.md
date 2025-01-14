@@ -31,7 +31,6 @@ function wavedec(
 function waverec(
   coeffs: Float64Array[],
   wavelet: Wavelet,
-  signallength: number,
   mode?: Mode,
 ): Float64Array;
 ```

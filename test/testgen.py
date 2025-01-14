@@ -6,7 +6,7 @@ PREAMBLE = """
 import { describe, expect, test } from "vitest";
 
 import { init, wavedec, waverec } from "wasmlets";
-import { expectArrayCloseTo } from "./util";
+import { expectArrayCloseTo, expectWaveletRoundtripped } from "./util";
 
 // prettier-ignore-start
 describe("test all wavelets against pywt", () => {
@@ -18,16 +18,17 @@ POSTAMBLE = """
 // prettier-ignore-end
 """
 
+
 def print_test(name, data, expected, wavelet):
     print(f"""
     test("{name}", async () => {{
         await init();
         const data = new Float64Array({data});
         const expected = {expected};
-        const result = wavedec(data, {wavelet});
+        const result = wavedec(data, {wavelet!r});
 
-        const reconstruction = waverec(result, {wavelet}, data.length);
-        expectArrayCloseTo(reconstruction, data);
+        const reconstruction = waverec(result, {wavelet!r});
+        expectWaveletRoundtripped(data, reconstruction);
 
         expect(result.length).toBe(expected.length);
 
@@ -47,6 +48,8 @@ def generate_test_signal(num_samples):
     return signal
 
 
+N = 256
+
 if __name__ == "__main__":
     print(PREAMBLE)
 
@@ -60,21 +63,21 @@ if __name__ == "__main__":
         ):
             continue
 
-        signal = generate_test_signal(256)
+        signal = generate_test_signal(N)
         coeffs = pywt.wavedec(signal, wavelet)
 
         data = str(signal.tolist())
         expected = str([c.tolist() for c in coeffs])
 
         print_test(f"test_{wavelet}", data, expected,
-                repr(wavelet.replace("rbio", "rbior")))
+                   wavelet.replace("rbio", "rbior"))
 
-        signal_odd = generate_test_signal(255)
+        signal_odd = generate_test_signal(N - 1)
         coeffs_odd = pywt.wavedec(signal_odd, wavelet)
         data = str(signal_odd.tolist())
         expected = str([c.tolist() for c in coeffs_odd])
 
         print_test(f"test_{wavelet}_odd", data, expected,
-                repr(wavelet.replace("rbio", "rbior")))
+                   wavelet.replace("rbio", "rbior"))
 
     print(POSTAMBLE)
