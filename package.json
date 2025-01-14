@@ -27,7 +27,7 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "format": "prettier . --write",
-    "lint": "eslint && tsc --noEmit && attw --pack"
+    "lint": "eslint && tsc --noEmit && attw --pack . --profile node16"
   },
   "tsup": {
     "entry": [
@@ -49,7 +49,7 @@
     "arrowParens": "avoid"
   },
   "devDependencies": {
-    "@arethetypeswrong/cli": "^0.15.3",
+    "@arethetypeswrong/cli": "^0.17.3",
     "@vitest/coverage-v8": "^1.6.0",
     "eslint": "^9.17.0",
     "prettier": "^3.3.1",
