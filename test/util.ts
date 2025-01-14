@@ -16,7 +16,7 @@ export function expectArrayCloseTo(
 export function expectWaveletRoundtripped(
   signal: Float64Array | number[],
   reconstruction: Float64Array | number[],
-){
+) {
   if (signal.length % 2 !== 0) {
     expectArrayCloseTo(signal, reconstruction.slice(0, -1));
   } else {

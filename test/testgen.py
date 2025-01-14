@@ -74,10 +74,10 @@ if __name__ == "__main__":
 
         signal_odd = generate_test_signal(N - 1)
         coeffs_odd = pywt.wavedec(signal_odd, wavelet)
-        data = str(signal_odd.tolist())
-        expected = str([c.tolist() for c in coeffs_odd])
+        data_odd = str(signal_odd.tolist())
+        expected_odd = str([c.tolist() for c in coeffs_odd])
 
-        print_test(f"test_{wavelet}_odd", data, expected,
+        print_test(f"test_{wavelet}_odd", data_odd, expected_odd,
                    wavelet.replace("rbio", "rbior"))
 
     print(POSTAMBLE)

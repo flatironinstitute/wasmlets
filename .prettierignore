@@ -2,3 +2,4 @@ dist/
 coverage/
 src/wasm/
 c/wavelib/
+test/generated.test.ts
