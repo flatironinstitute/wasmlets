@@ -8,6 +8,9 @@ environment, by compiling existing libraries to
 Currently, we are using the [wavelib](https://github.com/rafat/wavelib)
 C library as the underlying implementation.
 
+How fast is it? See [flatironinstitute/web-wavelets-benchmarking](https://github.com/flatironinstitute/web-wavelets-benchmarking)
+for comparisons (more always welcome!)
+
 ## Installation
 
 ```sh
