@@ -24,7 +24,7 @@ jobs:
       - name: Setup Emscripten
         uses: mymindstorm/setup-emsdk@v14
         with:
-          version: "3.1.74"
+          version: "4.0.2"
       - name: Build WASM
         run: make
 
